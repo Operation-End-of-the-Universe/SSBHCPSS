@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixelated Fighting Game</title>
+    <style>
+        canvas {
+            border: 2px solid black;
+            display: block;
+            margin: 0 auto;
+            background-color: #cce7ff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Character setup
+        const characters = {
+            Jayden: {
+                x: 50, y: 200, width: 50, height: 100, color: 'blue',
+                moves: {
+                    punch: () => console.log("Jayden punches!"),
+                    kick: () => console.log("Jayden kicks!"),
+                    apPhysicsStress: () => console.log("AP Physics Stress: Damage +5%!")
+                }
+            },
+            Joseph: {
+                x: 700, y: 200, width: 50, height: 100, color: 'green',
+                moves: {
+                    throwBook: () => console.log("Joseph throws a book!"),
+                    kick: () => console.log("Joseph kicks!"),
+                    rhsPunch: () => console.log("RHS Punch: Damage +50%!")
+                }
+            }
+        };
+
+        // Draw characters
+        function drawCharacter(character) {
+            ctx.fillStyle = character.color;
+            ctx.fillRect(character.x, character.y, character.width, character.height);
+        }
+
+        // Game loop
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawCharacter(characters.Jayden);
+            drawCharacter(characters.Joseph);
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+
+        // Handle keyboard input for moves
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'a': characters.Jayden.moves.punch(); break;
+                case 's': characters.Jayden.moves.kick(); break;
+                case 'd': characters.Jayden.moves.apPhysicsStress(); break;
+                case 'j': characters.Joseph.moves.throwBook(); break;
+                case 'k': characters.Joseph.moves.kick(); break;
+                case 'l': characters.Joseph.moves.rhsPunch(); break;
+                default: break;
+            }
+        });
+    </script>
+</body>
+</html>
