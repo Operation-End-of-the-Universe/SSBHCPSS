@@ -11,30 +11,44 @@
             margin: 0 auto;
             background-color: #cce7ff;
         }
+
+        #ui {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
     </style>
 </head>
 <body>
+    <div id="ui">
+        <h1>Pixelated Fighting Game</h1>
+        <p>Controls: Jayden (A: Punch, S: Kick, D: AP Physics Stress). Joseph (J: Throw Book, K: Kick, L: RHS Punch).</p>
+    </div>
     <canvas id="gameCanvas" width="800" height="400"></canvas>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
+        // Game variables
+        let gameOver = false;
+
         // Character setup
         const characters = {
             Jayden: {
                 x: 50, y: 200, width: 50, height: 100, color: 'blue',
+                health: 100,
                 moves: {
-                    punch: () => console.log("Jayden punches!"),
-                    kick: () => console.log("Jayden kicks!"),
-                    apPhysicsStress: () => console.log("AP Physics Stress: Damage +5%!")
+                    punch: () => attack(characters.Joseph, 10),
+                    kick: () => attack(characters.Joseph, 15),
+                    apPhysicsStress: () => attack(characters.Joseph, 5, true)
                 }
             },
             Joseph: {
                 x: 700, y: 200, width: 50, height: 100, color: 'green',
+                health: 100,
                 moves: {
-                    throwBook: () => console.log("Joseph throws a book!"),
-                    kick: () => console.log("Joseph kicks!"),
-                    rhsPunch: () => console.log("RHS Punch: Damage +50%!")
+                    throwBook: () => attack(characters.Jayden, 10),
+                    kick: () => attack(characters.Jayden, 15),
+                    rhsPunch: () => attack(characters.Jayden, 25)
                 }
             }
         };
@@ -45,27 +59,59 @@
             ctx.fillRect(character.x, character.y, character.width, character.height);
         }
 
+        // Draw health bars
+        function drawHealthBars() {
+            ctx.fillStyle = 'red';
+            ctx.fillRect(50, 50, characters.Jayden.health * 2, 20);
+            ctx.fillRect(550, 50, characters.Joseph.health * 2, 20);
+            ctx.strokeStyle = 'black';
+            ctx.strokeRect(50, 50, 200, 20);
+            ctx.strokeRect(550, 50, 200, 20);
+        }
+
+        // Attack logic
+        function attack(target, damage, boost = false) {
+            if (boost) damage += 5; // Apply damage boost if any
+            target.health -= damage;
+            if (target.health <= 0) {
+                target.health = 0;
+                endGame(`${target === characters.Jayden ? 'Joseph' : 'Jayden'} Wins!`);
+            }
+        }
+
+        // Game over logic
+        function endGame(winner) {
+            gameOver = true;
+            alert(winner);
+        }
+
         // Game loop
         function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawCharacter(characters.Jayden);
-            drawCharacter(characters.Joseph);
-            requestAnimationFrame(gameLoop);
+            if (!gameOver) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawCharacter(characters.Jayden);
+                drawCharacter(characters.Joseph);
+                drawHealthBars();
+                requestAnimationFrame(gameLoop);
+            }
         }
-        gameLoop();
 
         // Handle keyboard input for moves
         document.addEventListener('keydown', (e) => {
-            switch (e.key) {
-                case 'a': characters.Jayden.moves.punch(); break;
-                case 's': characters.Jayden.moves.kick(); break;
-                case 'd': characters.Jayden.moves.apPhysicsStress(); break;
-                case 'j': characters.Joseph.moves.throwBook(); break;
-                case 'k': characters.Joseph.moves.kick(); break;
-                case 'l': characters.Joseph.moves.rhsPunch(); break;
-                default: break;
+            if (!gameOver) {
+                switch (e.key) {
+                    case 'a': characters.Jayden.moves.punch(); break;
+                    case 's': characters.Jayden.moves.kick(); break;
+                    case 'd': characters.Jayden.moves.apPhysicsStress(); break;
+                    case 'j': characters.Joseph.moves.throwBook(); break;
+                    case 'k': characters.Joseph.moves.kick(); break;
+                    case 'l': characters.Joseph.moves.rhsPunch(); break;
+                    default: break;
+                }
             }
         });
+
+        gameLoop();
     </script>
 </body>
 </html>
